@@ -41,7 +41,10 @@ const customTheme: DefaultTheme = {
     },
     pink: {
       ...theme.colors.pink,
-      500: '#D63157'
+      200: '#DD758D',
+      500: '#D63157',
+      600: '#A32643',
+      700: '#571424'
     }
   }
 };

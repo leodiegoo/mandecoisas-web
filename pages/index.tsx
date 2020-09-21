@@ -1,4 +1,15 @@
-import { Flex, Grid, Image, Text, Box, Icon, Input } from '@chakra-ui/core';
+import {
+  Flex,
+  Grid,
+  Image,
+  Text,
+  Box,
+  Icon,
+  Input,
+  InputGroup,
+  InputRightElement,
+  IconButton
+} from '@chakra-ui/core';
 
 const Index = () => (
   <Grid
@@ -62,11 +73,21 @@ const Index = () => (
         gridRow="sendContent-end"
         gridTemplateRows="1.5rem auto">
         <Text fontSize="2xl">Receber</Text>
-        <Input
-          placeholder="Insira o PIN e dê enter"
-          height="50px"
-          borderRadius="sm"
-        />
+        <InputGroup size="md">
+          <Input placeholder="Insira o PIN" borderRadius="sm" />
+          <InputRightElement width="4.5rem">
+            <IconButton
+              h="1.75rem"
+              aria-label="Baixar"
+              size="sm"
+              icon="download"
+              borderRadius="sm"
+              bg="pink.500"
+              _hover={{ bg: 'pink.600' }}
+              _active={{ bg: 'pink.500' }}
+            />
+          </InputRightElement>
+        </InputGroup>
       </Box>
     </Grid>
   </Grid>
