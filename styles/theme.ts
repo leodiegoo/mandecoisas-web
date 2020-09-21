@@ -7,6 +7,18 @@ const customTheme: DefaultTheme = {
     heading: 'Roboto, system-ui, sans-serif',
     mono: 'Menlo, monospace'
   },
+  fontSizes: {
+    xs: '0.75rem',
+    sm: '0.875rem',
+    md: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.75rem',
+    '4xl': '2.25rem',
+    '5xl': '3rem',
+    '6xl': '4rem'
+  },
   fontWeights: {
     ...theme.fontWeights,
     normal: 400,
@@ -25,7 +37,11 @@ const customTheme: DefaultTheme = {
       300: '#e1e1e6',
       600: '#29292e',
       700: '#202024',
-      800: '#121214'
+      800: '#222222'
+    },
+    pink: {
+      ...theme.colors.pink,
+      500: '#D63157'
     }
   }
 };
