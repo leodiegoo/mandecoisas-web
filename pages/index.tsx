@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, createRef } from 'react';
+import { useState, createRef } from 'react';
 
 import {
   Flex,
@@ -97,50 +97,67 @@ const Index = () => {
           <Text gridRow="1" fontSize="2xl">
             Enviar
           </Text>
-          <Grid>
+          <Grid templateColumns="1fr">
             {files.length ? (
-              <Box
-                bg="gray.600"
-                boxShadow="sm"
-                alignSelf="flex-start"
-                p={2}
-                my={5}>
-                <List spacing={1} styleType="none">
-                  {files.map((file) => (
-                    <ListItem key={file.name}>
-                      <Badge
-                        fontSize="xs"
-                        letterSpacing="3px"
-                        variantColor="purple"
-                        style={{ whiteSpace: 'normal' }}
-                        wordBreak="break-word"
-                        variant="subtle">
-                        {file.name}
-                      </Badge>{' '}
-                      <Badge
-                        fontSize="xs"
-                        letterSpacing="3px"
-                        variantColor="yellow"
-                        wordBreak="break-all"
-                        variant="subtle">
-                        {niceBytes(file.size)}
-                      </Badge>
-                    </ListItem>
-                  ))}
-                </List>
-                <IconButton
-                  width="100%"
-                  icon="add"
-                  variant="ghost"
-                  aria-label="adicionar mais itens"
-                  color="white"
-                  size="lg"
-                  bg="pink.500"
-                  my={2}
-                  _hover={{ bg: 'pink.600' }}
-                  onClick={openDropzoneDialog}
-                />
-              </Box>
+              <Flex
+                flexDirection="column"
+                alignSelf="stretch"
+                alignItems="stretch">
+                <Box
+                  bg="gray.600"
+                  boxShadow="sm"
+                  alignSelf="stretch"
+                  p={2}
+                  my={5}>
+                  <List spacing={1} styleType="none">
+                    {files.map((file) => (
+                      <ListItem key={file.name}>
+                        <Badge
+                          fontSize="xs"
+                          letterSpacing="3px"
+                          variantColor="purple"
+                          style={{ whiteSpace: 'normal' }}
+                          wordBreak="break-word"
+                          variant="subtle">
+                          {file.name}
+                        </Badge>{' '}
+                        <Badge
+                          fontSize="xs"
+                          letterSpacing="3px"
+                          variantColor="yellow"
+                          wordBreak="break-all"
+                          variant="subtle">
+                          {niceBytes(file.size)}
+                        </Badge>
+                      </ListItem>
+                    ))}
+                  </List>
+                  <IconButton
+                    width="100%"
+                    icon="add"
+                    variant="ghost"
+                    aria-label="adicionar mais itens"
+                    color="white"
+                    size="lg"
+                    bg="pink.500"
+                    my={2}
+                    _hover={{ bg: 'pink.600' }}
+                    onClick={openDropzoneDialog}
+                  />
+                </Box>
+
+                <Box alignSelf="center" justifySelf="flex-start">
+                  <Button borderRadius="sm" leftIcon="sun" isDisabled>
+                    Direto
+                  </Button>{' '}
+                  <Button borderRadius="sm" leftIcon="link">
+                    Link
+                  </Button>{' '}
+                  <Button borderRadius="sm" leftIcon="lock">
+                    PIN
+                  </Button>
+                </Box>
+              </Flex>
             ) : (
               <Icon
                 gridRow="2"
