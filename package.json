@@ -19,9 +19,11 @@
     "axios": "^0.20.0",
     "emotion-theming": "^10.0.27",
     "next": "^9.5.3",
+    "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-dropzone": "^11.2.0",
+    "react-icons": "^3.11.0",
     "styled-components": "^5.2.0"
   },
   "devDependencies": {

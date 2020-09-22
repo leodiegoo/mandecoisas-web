@@ -16,17 +16,30 @@ import {
   Badge,
   Button
 } from '@chakra-ui/core';
+import { AiFillCamera as CameraIcon } from 'react-icons/ai';
 
 import { useDropzone } from 'react-dropzone';
+import QRCode from 'qrcode.react';
 
 import api from '../config/api';
 
+interface IMandeCoisas {
+  type_id: string;
+  id: string | number;
+  size: number;
+  total_files: number;
+  expires_in: Date;
+}
+
 const Index = () => {
   const [files, setFiles] = useState<File[]>([]);
+  const [mandeCoisas, setMandeCoisas] = useState<IMandeCoisas>(null);
+  const [isDropDesabilitado, setDropDesabilitado] = useState<boolean>(false);
+
   const { getRootProps, getInputProps, open: openDropzoneDialog } = useDropzone(
     {
-      noClick: !!files.length,
-      noKeyboard: !!files.length,
+      noClick: isDropDesabilitado,
+      noKeyboard: isDropDesabilitado,
       onDrop: (e) => filesDrop(e)
     }
   );
@@ -49,19 +62,41 @@ const Index = () => {
       return !files.filter((file) => file.name === name).length;
     });
     setFiles([...files, ...filesFiltered]);
+    setDropDesabilitado(true);
   };
 
-  const sendFiles = async (type_id: string) => {
-    const data = {
-      files,
-      type_id
-    };
-    // const response = await api.post(`/file`, data, {
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data'
-    //   }
-    // });
-    console.log(process.env);
+  const sendFiles = async (typeid: string) => {
+    try {
+      const data = new FormData();
+      data.append('type_id', typeid);
+      files.forEach((file) => {
+        data.append('files', file);
+      });
+      const {
+        data: { id, type_id, size, total_files, expires_in }
+      } = await api.post(`/file`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setMandeCoisas({
+        id,
+        type_id,
+        size,
+        total_files,
+        expires_in: new Date(expires_in.split('.')[0])
+      });
+      setFiles([]);
+      setDropDesabilitado(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const limparDados = () => {
+    setMandeCoisas(null);
+    setFiles([]);
+    setDropDesabilitado(false);
   };
 
   return (
@@ -108,10 +143,10 @@ const Index = () => {
           cursor={!files.length ? 'pointer' : 'default'}>
           <input {...getInputProps()} />
           <Text gridRow="1" fontSize="2xl">
-            Enviar
+            {mandeCoisas ? 'Finalizado!' : 'Enviar'}
           </Text>
           <Grid templateColumns="1fr">
-            {files.length ? (
+            {!!files.length && !mandeCoisas ? (
               <Flex
                 flexDirection="column"
                 alignSelf="stretch"
@@ -178,14 +213,63 @@ const Index = () => {
                 </Box>
               </Flex>
             ) : (
-              <Icon
-                gridRow="2"
-                name="add"
-                size="3rem"
-                alignSelf="flex-start"
-                justifySelf="center"
-                color="pink.500"
-              />
+              <>
+                {mandeCoisas ? (
+                  <Flex
+                    flexDir="column"
+                    alignItems="center"
+                    justifyContent="center">
+                    <Flex my={1}>
+                      <QRCode value={` http://mndc.now.sh/${mandeCoisas.id}`} />
+                    </Flex>
+                    <Button
+                      variantColor="purple"
+                      my={1}
+                      leftIcon="copy"
+                      variant="ghost">
+                      <Text fontWeight="normal" color="gray.500">
+                        http://mndc.now.sh/
+                      </Text>
+                      <Text>{mandeCoisas.id}</Text>
+                    </Button>
+                    <Text my={1} fontWeight="normal" color="gray.500">
+                      Expira às{' '}
+                      {`${mandeCoisas.expires_in.getHours()}:${mandeCoisas.expires_in.getMinutes()}`}
+                    </Text>
+                    <Flex
+                      alignSelf="stretch"
+                      justifyContent="space-between"
+                      flexDir="row"
+                      my={1}>
+                      <Text
+                        justifySelf="flex-start"
+                        alignSelf="baseline"
+                        fontWeight="normal"
+                        color="gray.500">
+                        Total {mandeCoisas.total_files} arquivos •{' '}
+                        {niceBytes(mandeCoisas.size)}
+                      </Text>
+                      <Button
+                        justifySelf="flex-end"
+                        alignSelf="baseline"
+                        leftIcon="check"
+                        variantColor="green"
+                        onClick={() => limparDados()}>
+                        <Text>OK</Text>
+                      </Button>
+                    </Flex>
+                  </Flex>
+                ) : (
+                  <Icon
+                    gridRow="2"
+                    name="add"
+                    size="3rem"
+                    alignSelf="flex-start"
+                    justifySelf="center"
+                    color="pink.500"
+                  />
+                )}
+              </>
             )}
           </Grid>
         </Grid>
@@ -207,9 +291,19 @@ const Index = () => {
                 h="1.75rem"
                 aria-label="Baixar"
                 size="sm"
+                icon={CameraIcon}
+                borderRadius="sm"
+                bg="pink.500"
+                _hover={{ bg: 'pink.600' }}
+              />
+              <IconButton
+                h="1.75rem"
+                aria-label="Baixar"
+                size="sm"
                 icon="download"
                 borderRadius="sm"
                 bg="pink.500"
+                mx={1}
                 _hover={{ bg: 'pink.600' }}
               />
             </InputRightElement>
