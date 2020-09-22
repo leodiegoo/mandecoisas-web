@@ -32,6 +32,8 @@
   },
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
+    "camelcase": "off",
+    "no-plusplus": "off",
     "no-use-before-define": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [

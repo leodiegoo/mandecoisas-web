@@ -19,18 +19,17 @@ import {
 
 import { useDropzone } from 'react-dropzone';
 
+import api from '../config/api';
+
 const Index = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const {
-    acceptedFiles,
-    getRootProps,
-    getInputProps,
-    open: openDropzoneDialog
-  } = useDropzone({
-    noClick: !!files.length,
-    noKeyboard: !!files.length,
-    onDrop: (e) => filesDrop(e)
-  });
+  const { getRootProps, getInputProps, open: openDropzoneDialog } = useDropzone(
+    {
+      noClick: !!files.length,
+      noKeyboard: !!files.length,
+      onDrop: (e) => filesDrop(e)
+    }
+  );
   const dropzoneRef = createRef();
 
   const niceBytes = (x) => {
@@ -50,6 +49,19 @@ const Index = () => {
       return !files.filter((file) => file.name === name).length;
     });
     setFiles([...files, ...filesFiltered]);
+  };
+
+  const sendFiles = async (type_id: string) => {
+    const data = {
+      files,
+      type_id
+    };
+    // const response = await api.post(`/file`, data, {
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data'
+    //   }
+    // });
+    console.log(process.env);
   };
 
   return (
@@ -92,7 +104,8 @@ const Index = () => {
           gridTemplateRows="1.5rem auto"
           padding={5}
           {...getRootProps()}
-          ref={dropzoneRef}>
+          ref={dropzoneRef}
+          cursor={!files.length ? 'pointer' : 'default'}>
           <input {...getInputProps()} />
           <Text gridRow="1" fontSize="2xl">
             Enviar
@@ -148,12 +161,18 @@ const Index = () => {
 
                 <Box alignSelf="center" justifySelf="flex-start">
                   <Button borderRadius="sm" leftIcon="sun" isDisabled>
-                    Direto
+                    QRCode
                   </Button>{' '}
-                  <Button borderRadius="sm" leftIcon="link">
+                  <Button
+                    borderRadius="sm"
+                    leftIcon="link"
+                    onClick={() => sendFiles('string')}>
                     Link
                   </Button>{' '}
-                  <Button borderRadius="sm" leftIcon="lock">
+                  <Button
+                    borderRadius="sm"
+                    leftIcon="lock"
+                    onClick={() => sendFiles('number')}>
                     PIN
                   </Button>
                 </Box>
