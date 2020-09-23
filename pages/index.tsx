@@ -14,13 +14,15 @@ import {
   List,
   ListItem,
   Badge,
-  Button
+  Button,
+  useToast
 } from '@chakra-ui/core';
 import { AiFillCamera as CameraIcon } from 'react-icons/ai';
 
 import { useDropzone } from 'react-dropzone';
 import QRCode from 'qrcode.react';
 
+import { loadProgressBar } from 'axios-progress-bar';
 import api from '../config/api';
 
 interface IMandeCoisas {
@@ -32,10 +34,12 @@ interface IMandeCoisas {
 }
 
 const Index = () => {
+  loadProgressBar({}, api);
   const [files, setFiles] = useState<File[]>([]);
   const [mandeCoisas, setMandeCoisas] = useState<IMandeCoisas>(null);
   const [isDropDesabilitado, setDropDesabilitado] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const toast = useToast();
   const { getRootProps, getInputProps, open: openDropzoneDialog } = useDropzone(
     {
       noClick: isDropDesabilitado,
@@ -67,6 +71,7 @@ const Index = () => {
 
   const sendFiles = async (typeid: string) => {
     try {
+      setIsLoading(true);
       const data = new FormData();
       data.append('type_id', typeid);
       files.forEach((file) => {
@@ -88,8 +93,17 @@ const Index = () => {
       });
       setFiles([]);
       setDropDesabilitado(true);
+      setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      toast({
+        title: 'Oops, tivemos um problema!',
+        description:
+          'Estamos passando por instabilidades, por favor tente novamente mais tarde.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true
+      });
+      setIsLoading(false);
     }
   };
 
@@ -195,16 +209,25 @@ const Index = () => {
                 </Box>
 
                 <Box alignSelf="center" justifySelf="flex-start">
-                  <Button borderRadius="sm" leftIcon="sun" isDisabled>
+                  <Button
+                    isLoading={isLoading}
+                    isDisabled={isLoading}
+                    borderRadius="sm"
+                    leftIcon="sun"
+                    onClick={() => sendFiles('number')}>
                     QRCode
                   </Button>{' '}
                   <Button
+                    isLoading={isLoading}
+                    isDisabled={isLoading}
                     borderRadius="sm"
                     leftIcon="link"
                     onClick={() => sendFiles('string')}>
                     Link
                   </Button>{' '}
                   <Button
+                    isLoading={isLoading}
+                    isDisabled={isLoading}
                     borderRadius="sm"
                     leftIcon="lock"
                     onClick={() => sendFiles('number')}>
@@ -220,22 +243,43 @@ const Index = () => {
                     alignItems="center"
                     justifyContent="center">
                     <Flex my={1}>
-                      <QRCode value={` http://mndc.now.sh/${mandeCoisas.id}`} />
+                      <QRCode value={`http://mndc.now.sh/${mandeCoisas.id}`} />
                     </Flex>
-                    <Button
-                      variantColor="purple"
+                    {mandeCoisas.type_id === 'string' ? (
+                      <Button
+                        variantColor="purple"
+                        my={1}
+                        leftIcon="copy"
+                        variant="ghost">
+                        <Text fontWeight="normal" color="gray.500">
+                          http://mndc.now.sh/
+                        </Text>
+                        <Text>{mandeCoisas.id}</Text>
+                      </Button>
+                    ) : (
+                      <Button
+                        variantColor="purple"
+                        my={4}
+                        p={4}
+                        leftIcon="copy"
+                        variant="ghost">
+                        <Text letterSpacing={20} fontSize="5xl">
+                          {mandeCoisas.id}
+                        </Text>
+                      </Button>
+                    )}
+                    <Text
+                      display={mandeCoisas.type_id === 'string' && 'none'}
                       my={1}
-                      leftIcon="copy"
-                      variant="ghost">
-                      <Text fontWeight="normal" color="gray.500">
-                        http://mndc.now.sh/
-                      </Text>
-                      <Text>{mandeCoisas.id}</Text>
-                    </Button>
+                      fontWeight="normal"
+                      color="gray.500">
+                      Insira a chave de 6 dígitos no dispositivo receptor
+                    </Text>
                     <Text my={1} fontWeight="normal" color="gray.500">
                       Expira às{' '}
                       {`${mandeCoisas.expires_in.getHours()}:${mandeCoisas.expires_in.getMinutes()}`}
                     </Text>
+
                     <Flex
                       alignSelf="stretch"
                       justifyContent="space-between"
