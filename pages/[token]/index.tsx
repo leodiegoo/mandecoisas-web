@@ -97,6 +97,7 @@ const Index = () => {
 
         return true;
       });
+
       await Promise.all(promises);
       setIsFilesLoading(false);
     } catch (error) {
