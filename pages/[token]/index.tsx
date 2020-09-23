@@ -183,7 +183,7 @@ const Index = () => {
                       {mandeCoisas?.files.map((file) => (
                         <Checkbox
                           defaultIsChecked
-                          onChangeCapture={(e) =>
+                          onChangeCapture={(e: any) =>
                             handleCheckbox(e.target.value)
                           }
                           value={file.id}
