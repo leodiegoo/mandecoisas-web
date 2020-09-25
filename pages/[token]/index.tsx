@@ -16,7 +16,6 @@ import {
 import { useRouter } from 'next/router';
 import { loadProgressBar } from 'axios-progress-bar';
 
-import Downloader from 'js-file-downloader';
 import FileSaver from 'file-saver';
 import api from '../../config/api';
 import DefaultLayout from '../_layouts/default';
@@ -91,13 +90,14 @@ const Index = () => {
 
         const { data } = await api.get(`/${file}`, { responseType: 'blob' });
         const blob = new Blob([data], { type: mimetype });
-        const URL = window.URL.createObjectURL(blob);
-        const tempLink = document.createElement('a');
-        tempLink.href = URL;
-        tempLink.setAttribute('download', original_name);
-        tempLink.click();
+        // const URL = window.URL.createObjectURL(blob);
+        // const tempLink = document.createElement('a');
+        // tempLink.href = URL;
+        // tempLink.setAttribute('download', original_name);
+        // tempLink.click();
+        return FileSaver.saveAs(blob, original_name);
 
-        return true;
+        // return true;
       });
 
       await Promise.all(promises);

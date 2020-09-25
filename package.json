@@ -20,7 +20,6 @@
     "axios-progress-bar": "^1.2.0",
     "emotion-theming": "^10.0.27",
     "file-saver": "^2.0.2",
-    "js-file-downloader": "^1.1.11",
     "next": "^9.5.3",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
