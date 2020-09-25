@@ -85,17 +85,19 @@ const Index = () => {
       setIsFilesLoading(true);
 
       const promises = checkedFiles.map(async (file) => {
-        const { original_name } = mandeCoisas.files.find(
+        const { original_name, mimetype } = mandeCoisas.files.find(
           (mnd) => mnd.id === file
         );
 
-        return new Downloader({
-          url: `${process.env.NEXT_PUBLIC_API}/${file}`,
-          autoStart: true,
-          nameCallback(name) {
-            return original_name;
-          }
-        });
+        const { data } = await api.get(`/${file}`, { responseType: 'blob' });
+        const blob = new Blob([data], { type: mimetype });
+        const URL = window.URL.createObjectURL(blob);
+        const tempLink = document.createElement('a');
+        tempLink.href = URL;
+        tempLink.setAttribute('download', original_name);
+        tempLink.click();
+
+        return true;
       });
 
       await Promise.all(promises);
