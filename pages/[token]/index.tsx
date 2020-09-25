@@ -87,10 +87,11 @@ const Index = () => {
           (mnd) => mnd.id === file
         );
         await api.get(`/${file}`);
-        return FileSaver.saveAs(
-          `${process.env.NEXT_PUBLIC_API}/${file}`,
-          original_name
-        );
+        // return FileSaver.saveAs(
+        //   `${process.env.NEXT_PUBLIC_API}/${file}`,
+        //   original_name
+        // );
+        return true;
       });
 
       await Promise.all(promises);
