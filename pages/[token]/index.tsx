@@ -16,6 +16,7 @@ import {
 import { useRouter } from 'next/router';
 import { loadProgressBar } from 'axios-progress-bar';
 
+import Downloader from 'js-file-downloader';
 import FileSaver from 'file-saver';
 import api from '../../config/api';
 import DefaultLayout from '../_layouts/default';
@@ -82,19 +83,23 @@ const Index = () => {
   const receber = async () => {
     try {
       setIsFilesLoading(true);
+
       const promises = checkedFiles.map(async (file) => {
         const { original_name } = mandeCoisas.files.find(
           (mnd) => mnd.id === file
         );
-        await api.get(`/${file}`);
-        // return FileSaver.saveAs(
-        //   `${process.env.NEXT_PUBLIC_API}/${file}`,
-        //   original_name
-        // );
-        return true;
+
+        return new Downloader({
+          url: `${process.env.NEXT_PUBLIC_API}/${file}`,
+          autoStart: true,
+          nameCallback(name) {
+            return original_name;
+          }
+        });
       });
 
       await Promise.all(promises);
+
       setIsFilesLoading(false);
     } catch (error) {
       setIsFilesLoading(false);
