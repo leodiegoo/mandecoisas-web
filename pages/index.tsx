@@ -1,4 +1,4 @@
-import { useState, createRef } from 'react';
+import { useState, createRef, useRef } from 'react';
 
 import {
   Flex,
@@ -24,6 +24,7 @@ import QRCode from 'qrcode.react';
 
 import { loadProgressBar } from 'axios-progress-bar';
 import api from '../config/api';
+import DefaultLayout from './_layouts/default';
 
 interface IMandeCoisas {
   type_id: string;
@@ -39,6 +40,9 @@ const Index = () => {
   const [mandeCoisas, setMandeCoisas] = useState<IMandeCoisas>(null);
   const [isDropDesabilitado, setDropDesabilitado] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingPIN, setIsLoadingPIN] = useState<boolean>(false);
+  const [isLoadingQRCode, setIsLoadingQRCode] = useState<boolean>(false);
+  const [isLoadingLink, setIsLoadingLink] = useState<boolean>(false);
   const toast = useToast();
   const { getRootProps, getInputProps, open: openDropzoneDialog } = useDropzone(
     {
@@ -48,6 +52,7 @@ const Index = () => {
     }
   );
   const dropzoneRef = createRef();
+  const copyButtonRef = createRef();
 
   const niceBytes = (x) => {
     const [bytes] = x.toString().split(' ');
@@ -71,9 +76,16 @@ const Index = () => {
 
   const sendFiles = async (typeid: string) => {
     try {
+      let typeidz = typeid;
       setIsLoading(true);
+      if (typeid === 'string') setIsLoadingLink(true);
+      else if (typeid === 'number') setIsLoadingPIN(true);
+      else {
+        typeidz = 'number';
+        setIsLoadingQRCode(true);
+      }
       const data = new FormData();
-      data.append('type_id', typeid);
+      data.append('type_id', typeidz);
       files.forEach((file) => {
         data.append('files', file);
       });
@@ -94,6 +106,9 @@ const Index = () => {
       setFiles([]);
       setDropDesabilitado(true);
       setIsLoading(false);
+      setIsLoadingLink(false);
+      setIsLoadingPIN(false);
+      setIsLoadingQRCode(false);
     } catch (error) {
       toast({
         title: 'Oops, tivemos um problema!',
@@ -104,6 +119,9 @@ const Index = () => {
         isClosable: true
       });
       setIsLoading(false);
+      setIsLoadingLink(false);
+      setIsLoadingPIN(false);
+      setIsLoadingQRCode(false);
     }
   };
 
@@ -113,26 +131,17 @@ const Index = () => {
     setDropDesabilitado(false);
   };
 
+  const copyToClipboard = (textToCopy) => {
+    const textarea = document.createElement('textarea');
+    textarea.innerText = textToCopy;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  };
+
   return (
-    <Grid
-      as="main"
-      height="100vh"
-      templateColumns="1fr"
-      templateRows="15% auto"
-      templateAreas="
-      'header'
-      'content'
-    "
-      justifyContent="center"
-      alignItems="center">
-      <Flex
-        gridArea="header"
-        flexDir="column"
-        alignItems="center"
-        alignSelf="stretch"
-        padding={2}>
-        <Image src="/images/logo.svg" height="100%" />
-      </Flex>
+    <DefaultLayout>
       <Grid
         gridArea="content"
         flexDir="column"
@@ -210,15 +219,15 @@ const Index = () => {
 
                 <Box alignSelf="center" justifySelf="flex-start">
                   <Button
-                    isLoading={isLoading}
+                    isLoading={isLoadingQRCode}
                     isDisabled={isLoading}
                     borderRadius="sm"
                     leftIcon="sun"
-                    onClick={() => sendFiles('number')}>
+                    onClick={() => sendFiles('qrcode')}>
                     QRCode
                   </Button>{' '}
                   <Button
-                    isLoading={isLoading}
+                    isLoading={isLoadingLink}
                     isDisabled={isLoading}
                     borderRadius="sm"
                     leftIcon="link"
@@ -226,7 +235,7 @@ const Index = () => {
                     Link
                   </Button>{' '}
                   <Button
-                    isLoading={isLoading}
+                    isLoading={isLoadingPIN}
                     isDisabled={isLoading}
                     borderRadius="sm"
                     leftIcon="lock"
@@ -243,14 +252,20 @@ const Index = () => {
                     alignItems="center"
                     justifyContent="center">
                     <Flex my={1}>
-                      <QRCode value={`http://mndc.now.sh/${mandeCoisas.id}`} />
+                      <QRCode value={`https://mndc.now.sh/${mandeCoisas.id}`} />
                     </Flex>
                     {mandeCoisas.type_id === 'string' ? (
                       <Button
                         variantColor="purple"
                         my={1}
                         leftIcon="copy"
-                        variant="ghost">
+                        variant="ghost"
+                        ref={copyButtonRef}
+                        onClick={() =>
+                          copyToClipboard(
+                            `https://mndc.now.sh/${mandeCoisas.id}`
+                          )
+                        }>
                         <Text fontWeight="normal" color="gray.500">
                           http://mndc.now.sh/
                         </Text>
@@ -258,6 +273,12 @@ const Index = () => {
                       </Button>
                     ) : (
                       <Button
+                        ref={copyButtonRef}
+                        onClick={() =>
+                          copyToClipboard(
+                            `http://mndc.now.sh/${mandeCoisas.id}`
+                          )
+                        }
                         variantColor="purple"
                         my={4}
                         p={4}
@@ -354,7 +375,7 @@ const Index = () => {
           </InputGroup>
         </Box>
       </Grid>
-    </Grid>
+    </DefaultLayout>
   );
 };
 

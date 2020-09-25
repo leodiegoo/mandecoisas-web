@@ -126,6 +126,7 @@ const Index = () => {
   };
 
   const niceBytes = (x) => {
+    if (!x) return x;
     const [bytes] = x.toString().split(' ');
     const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     let l = 0;
@@ -137,7 +138,14 @@ const Index = () => {
   };
 
   return (
-    <DefaultLayout>
+    <DefaultLayout
+      title={
+        mandeCoisas
+          ? `@ ${mandeCoisas?.transfer.total_files} arquivos • ${niceBytes(
+              mandeCoisas?.transfer.size
+            )}`
+          : ''
+      }>
       <Grid
         gridArea="content"
         flexDir="column"

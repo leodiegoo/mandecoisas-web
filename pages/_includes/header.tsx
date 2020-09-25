@@ -1,4 +1,5 @@
 import { Flex, Image } from '@chakra-ui/core';
+import Link from 'next/link';
 
 const Header = () => {
   return (
@@ -8,7 +9,9 @@ const Header = () => {
       alignItems="center"
       alignSelf="stretch"
       padding={2}>
-      <Image src="/images/logo.svg" height="100%" />
+      <Link href="/">
+        <Image cursor="pointer" src="/images/logo.svg" height="100%" />
+      </Link>
     </Flex>
   );
 };
