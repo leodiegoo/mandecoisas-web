@@ -8,9 +8,9 @@ interface IDefaultLayoutProps {
 }
 
 const DefaultLayout: React.FC<IDefaultLayoutProps> = ({
-  title,
+  title = '',
   children,
-  description
+  description = ''
 }) => (
   <main>
     <Head>
