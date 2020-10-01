@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/core';
 
 import { useRouter } from 'next/router';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { loadProgressBar } from 'axios-progress-bar';
 
 import FileSaver from 'file-saver';
@@ -46,58 +47,57 @@ interface IMandeCoisas {
   transfer: ITransfer;
 }
 
-interface ICheckedItems {
-  number;
-  boolean;
-}
-
-const Index = () => {
-  loadProgressBar({}, api);
-  const [mandeCoisas, setMandeCoisas] = useState<IMandeCoisas>(null);
-  const [checkedFiles, setCheckedFiles] = useState([]);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+const Index = ({ ...mandeCoisas }: IMandeCoisas) => {
+  const [uncheckedFiles, setUncheckedFiles] = useState([]);
+  const [isPageLoading, setIsPageLoading] = useState(false);
   const [isFilesLoading, setIsFilesLoading] = useState(false);
   const toast = useToast();
+  const { isFallback } = useRouter();
 
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const { token } = router.query;
-      if (token) {
-        const { data } = await api.get<IMandeCoisas>(`/${token}`);
-        setMandeCoisas(data);
-        setIsPageLoading(false);
-      }
-    };
-
-    fetchFiles();
-  }, [router.query.token]);
-
-  useEffect(() => {
-    const map = mandeCoisas?.files.map((file) => file.id);
-    setCheckedFiles(map);
-  }, [mandeCoisas]);
+  if (isFallback) {
+    return (
+      <Grid
+        gridArea="content"
+        flexDir="column"
+        alignSelf="stretch"
+        alignItems="flex-start"
+        gridTemplateColumns={['1fr']}
+        padding={2}>
+        <CircularProgress
+          isIndeterminate
+          size="lg"
+          alignSelf="center"
+          justifySelf="center"
+          my={10}
+          color="purple"
+        />
+      </Grid>
+    );
+  }
 
   const receber = async () => {
     try {
+      loadProgressBar({}, api);
       setIsFilesLoading(true);
 
-      const promises = checkedFiles.map(async (file) => {
-        const { original_name, mimetype } = mandeCoisas.files.find(
-          (mnd) => mnd.id === file
-        );
+      let filesToDownload = [];
+      if (uncheckedFiles.length > 0) {
+        filesToDownload = mandeCoisas.files.filter((file) => {
+          const exist = uncheckedFiles.find(
+            (uncheckedFile) => file.id === uncheckedFile
+          );
+          return !exist;
+        });
+      } else {
+        filesToDownload = mandeCoisas.files;
+      }
 
-        const { data } = await api.get(`/${file}`, { responseType: 'blob' });
+      const promises = filesToDownload.map(async (file: IFiles) => {
+        const { mimetype, original_name } = file;
+
+        const { data } = await api.get(`/${file.id}`, { responseType: 'blob' });
         const blob = new Blob([data], { type: mimetype });
-        // const URL = window.URL.createObjectURL(blob);
-        // const tempLink = document.createElement('a');
-        // tempLink.href = URL;
-        // tempLink.setAttribute('download', original_name);
-        // tempLink.click();
         return FileSaver.saveAs(blob, original_name);
-
-        // return true;
       });
 
       await Promise.all(promises);
@@ -118,10 +118,10 @@ const Index = () => {
   };
 
   const handleCheckbox = (value) => {
-    if (checkedFiles.includes(value)) {
-      setCheckedFiles(checkedFiles.filter((file) => file !== value));
+    if (uncheckedFiles.includes(value)) {
+      setUncheckedFiles(uncheckedFiles.filter((file) => file !== value));
     } else {
-      setCheckedFiles([...checkedFiles, value]);
+      setUncheckedFiles([...uncheckedFiles, value]);
     }
   };
 
@@ -141,8 +141,8 @@ const Index = () => {
     <DefaultLayout
       title={
         mandeCoisas
-          ? `@ ${mandeCoisas?.transfer.total_files} arquivos • ${niceBytes(
-              mandeCoisas?.transfer.size
+          ? `@ ${mandeCoisas?.transfer?.total_files} arquivos • ${niceBytes(
+              mandeCoisas?.transfer?.size
             )}`
           : ''
       }>
@@ -243,6 +243,25 @@ const Index = () => {
       </Grid>
     </DefaultLayout>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: true
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const { token } = context.params;
+  const { data } = await api.get<IMandeCoisas>(`/${token}`);
+
+  return {
+    props: {
+      ...data
+    },
+    revalidate: false
+  };
 };
 
 export default Index;
