@@ -145,6 +145,13 @@ const Index = ({ ...mandeCoisas }: IMandeCoisas) => {
               mandeCoisas?.transfer?.size
             )}`
           : ''
+      }
+      description={
+        mandeCoisas
+          ? `${mandeCoisas?.transfer?.total_files} arquivos • ${niceBytes(
+              mandeCoisas?.transfer?.size
+            )}`
+          : ''
       }>
       <Grid
         gridArea="content"

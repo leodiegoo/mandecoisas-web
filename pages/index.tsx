@@ -1,9 +1,8 @@
-import { useState, createRef, useRef } from 'react';
+import { useState, createRef } from 'react';
 
 import {
   Flex,
   Grid,
-  Image,
   Text,
   Box,
   Icon,
@@ -17,8 +16,8 @@ import {
   Button,
   useToast
 } from '@chakra-ui/core';
-import { AiFillCamera as CameraIcon } from 'react-icons/ai';
 
+import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone';
 import QRCode from 'qrcode.react';
 
@@ -43,6 +42,9 @@ const Index = () => {
   const [isLoadingPIN, setIsLoadingPIN] = useState<boolean>(false);
   const [isLoadingQRCode, setIsLoadingQRCode] = useState<boolean>(false);
   const [isLoadingLink, setIsLoadingLink] = useState<boolean>(false);
+  const [pin, setPin] = useState();
+
+  const router = useRouter();
   const toast = useToast();
   const { getRootProps, getInputProps, open: openDropzoneDialog } = useDropzone(
     {
@@ -274,11 +276,7 @@ const Index = () => {
                     ) : (
                       <Button
                         ref={copyButtonRef}
-                        onClick={() =>
-                          copyToClipboard(
-                            `http://mndc.now.sh/${mandeCoisas.id}`
-                          )
-                        }
+                        onClick={() => copyToClipboard(mandeCoisas.id)}
                         variantColor="purple"
                         my={4}
                         p={4}
@@ -350,25 +348,22 @@ const Index = () => {
           gridTemplateRows="1.5rem auto">
           <Text fontSize="2xl">Receber</Text>
           <InputGroup size="md">
-            <Input placeholder="Insira o PIN" borderRadius="sm" />
+            <Input
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              placeholder="Insira o PIN"
+              type="number"
+              borderRadius="sm"
+            />
             <InputRightElement width="4.5rem">
               <IconButton
-                h="1.75rem"
-                aria-label="Baixar"
-                size="sm"
-                icon={CameraIcon}
-                borderRadius="sm"
-                bg="pink.500"
-                _hover={{ bg: 'pink.600' }}
-              />
-              <IconButton
+                onClick={() => router.push(`/${pin}`)}
                 h="1.75rem"
                 aria-label="Baixar"
                 size="sm"
                 icon="download"
                 borderRadius="sm"
                 bg="pink.500"
-                mx={1}
                 _hover={{ bg: 'pink.600' }}
               />
             </InputRightElement>
