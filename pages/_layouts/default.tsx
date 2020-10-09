@@ -6,7 +6,7 @@ interface IDefaultLayoutProps {
   title?: string;
   description?: string;
 }
- 
+
 const DefaultLayout: React.FC<IDefaultLayoutProps> = ({
   title = '',
   children,

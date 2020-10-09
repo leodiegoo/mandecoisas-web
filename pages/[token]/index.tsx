@@ -28,6 +28,7 @@ interface ITransfer {
   total_files: number;
   type_id: string;
   id?: string;
+  expired: boolean;
 }
 
 interface IFiles {
@@ -40,6 +41,7 @@ interface IFiles {
   file_name: string;
   id_transfer: string;
   size: number;
+  expired: boolean;
 }
 
 interface IMandeCoisas {
@@ -232,15 +234,22 @@ const Index = ({ ...mandeCoisas }: IMandeCoisas) => {
                     isLoading={isFilesLoading}
                     alignSelf="flex-end"
                     width="100%"
-                    leftIcon="download"
+                    leftIcon={
+                      mandeCoisas?.transfer?.expired
+                        ? 'not-allowed'
+                        : 'download'
+                    }
                     variant="ghost"
                     color="white"
                     size="lg"
                     bg="pink.500"
                     my={2}
                     onClick={receber}
+                    isDisabled={mandeCoisas?.transfer?.expired}
                     _hover={{ bg: 'pink.600' }}>
-                    Receber selecionados
+                    {mandeCoisas?.transfer?.expired
+                      ? 'Expirado'
+                      : 'Receber selecionados'}
                   </Button>
                 </>
               )}
