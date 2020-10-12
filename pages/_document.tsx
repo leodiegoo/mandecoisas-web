@@ -50,6 +50,14 @@ class MyDocument extends Document<DocumentProps> {
           />
           <meta name="msapplication-TileColor" content="#222222" />
           <meta name="theme-color" content="#222222" />
+          <meta
+            name="keywords"
+            content="Send Anywhere, File transfer, Send large files, email large files, File sharing, Share files online, Transfer files, Send large files free, wifi file transfer, transfer data, iOS, Android, Windows, macOS, Linux, Outlook add-in, Gmail, Chrome extension, Wifi direct, Cross platform"
+          />
+          <meta
+            name="description"
+            content="The easiest way to share files across all of your devices. Send files of any size and type, as many times as you want, all for free!"
+          />
         </Head>
         <body>
           <Main />
