@@ -98,12 +98,13 @@ const Index = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
+
       setMandeCoisas({
         id,
         type_id,
         size,
         total_files,
-        expires_in: new Date(expires_in.split('.')[0])
+        expires_in: new Date(expires_in)
       });
       setFiles([]);
       setDropDesabilitado(true);
