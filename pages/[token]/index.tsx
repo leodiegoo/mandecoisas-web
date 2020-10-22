@@ -107,15 +107,26 @@ const Index = ({ ...mandeCoisas }: IMandeCoisas) => {
       setIsFilesLoading(false);
     } catch (error) {
       setIsFilesLoading(false);
-      toast({
-        title: 'Oops, tivemos um problema!',
-        description:
-          'Estamos passando por instabilidades, por favor tente novamente mais tarde.',
-        status: 'error',
-        duration: 9000,
-        isClosable: true
-      });
-      console.error(error);
+
+      const erro = JSON.parse(await error.response.data.text());
+      if (erro.status === 'error') {
+        toast({
+          title: 'Oops!',
+          description: 'Esse arquivo já está expirado.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        });
+      } else {
+        toast({
+          title: 'Oops, tivemos um problema!',
+          description:
+            'Estamos passando por instabilidades, por favor tente novamente mais tarde.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        });
+      }
     }
   };
 
